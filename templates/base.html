@@ -1,0 +1,38 @@
+{% load static tailwind_tags %}
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    {% tailwind_css %}
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.2/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <link href="{% static 'css/static.css' %}" rel="stylesheet" type="text/css">
+    <link rel="icon" href="{% static 'images/chat.png' %}" type="image/x-icon">
+
+    <style>
+        [x-cloak] { display: none !important; }
+        
+      </style>
+    
+</head>
+<body>
+    {%include 'partials/toast.html'%}
+    {%include 'header.html'%}
+    
+    <div class="block  w-full h-screen ">
+    {%block content%}
+    {%endblock%}
+    </div>
+    
+        
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</body>
+</html>
+

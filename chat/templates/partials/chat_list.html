@@ -1,0 +1,32 @@
+<ul id="chat-list" class="flex-1 overflow-y-auto">
+    {% for chat in chat_list %}
+        <li class="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+            <a href="{% url 'chatroom' chat.group.group_name %}" class="flex items-center w-full">
+                {% if chat.group.is_private %}
+                    {% for member in chat.group.members.all %}
+                        {% if member != user %}
+                            <img src="{{ member.profile.avatar }}" alt="User" class="w-10 h-10 rounded-full mr-3">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <img src="https://via.placeholder.com/40" alt="Public Chat" class="w-10 h-10 rounded-full mr-3">
+                {% endif %}
+                <div class="flex-1">
+                    <div class="font-semibold">
+                        {% if chat.group.is_private %}
+                            {% for member in chat.group.members.all %}
+                                {% if member != user %}
+                                    {{ member.profile.name }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            Public Chat
+                        {% endif %}
+                    </div>
+                    <div class="text-sm text-gray-500">{{ chat.latest_message.author.name }} sent: {{ chat.latest_message.body|truncatechars:20 }}</div>
+                </div>
+            </a>
+            <span class="text-xs text-gray-500">{{ chat.formatted_time }}</span>
+        </li>
+    {% endfor %}
+</ul>

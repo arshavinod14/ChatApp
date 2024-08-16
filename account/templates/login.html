@@ -1,0 +1,38 @@
+{%extends 'base.html'%}
+
+{%block content%}
+
+<div class="bg-white ">
+    <div class="flex  flex-col items-center justify-center  ">
+      <div class="max-h-auto mx-auto max-w-xl border-y-4 border-indigo-500/50 p-16  mt-16 ">
+        <div class="mb-8 space-y-3 mr-20 ">
+          <p class="text-xl font-semibold">Login</p>
+          <p class="text-gray-500 ">Login with email and password or  <br />Sign In with Google</p>
+        </div>
+        <!-- Login form -->
+        <form class="w-full" method="post">
+            {%csrf_token%}
+          <div class="mb-10 space-y-3">
+            <div class="space-y-1">
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="email">Email</label>
+                <input class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" id="email" placeholder="mail@example.com" name="email" type="email" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" for="password">Password</label>
+                <input class="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" id="password" placeholder="password" name="password" type="password" />
+              </div>
+              
+            </div>
+            <button class="ring-offset-background focus-visible:ring-ring flex h-10 w-full items-center justify-center  whitespace-nowrap rounded-md bg-black  text-sm font-medium text-white transition-colors  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" type="submit">Login</button>
+            <div class="px-6 sm:px-0 max-w-sm">
+                <button type="button" class="text-white w-full  bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mr-2 mb-2"><svg class="mr-2 -ml-1 w-4 h-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>Sign up with Google<div></div></button>
+            </div>
+          </div>
+        </form>
+        <!-- Signup link -->
+        <div class="text-center"> No account? <a class="text-blue-500" href="{%url 'register'%}">Create one</a> </div>
+      </div>
+    </div>
+  </div>
+{%endblock%}

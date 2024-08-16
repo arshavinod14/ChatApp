@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content%}
+<!-- delete chatroom
+<h2>"{{chat_group.groupchat_name}}"</h2>
+<form method="post">
+    {%csrf_token%}
+    <button type="submit" class="mt-4 bg-red-500">Yes delete</button>
+    <a class="button bg-gray-300 ml-1" href="{{request.META.HTTP_REFERER}}">Cancel</a>
+</form> -->
+
+<content class="block max-w-3xl mx-auto md:p-12">
+    <div class="bg-white rounded-2xl md:drop-shadow-2xl shadow-black w-full p-8">
+
+        <div>
+            <h1 class="text-3xl font-bold mb-4">Delete ChatRoom</h1>
+            <h2>"{{chat_group.groupchat_name }}"</h2>
+            <p class="text-gray-600 mb-8">Are you sure you want to delete your chatGroup?</p>
+        </div>
+
+        <form method='POST' class="space-y-4">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                <button type="submit" class="w-full sm:w-auto flex justify-center py-3 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Yes, Delete
+                </button>
+                <a href="{{ request.META.HTTP_REFERER }}" class="w-full sm:w-auto flex justify-center py-3 px-6 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</content>
+{%endblock%}

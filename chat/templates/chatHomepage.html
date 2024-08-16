@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="bg-gray-100 h-screen flex border overflow-hidden">
+    <!-- Sidebar -->
+    {% include 'chat_sidebar.html' %}
+    
+    <!-- Main Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Default View -->
+        <div id="default-view" class="flex-1 flex items-center justify-center bg-gray-50" style="display: none;">
+            <div class="text-center">
+                <img src="{% static 'images/chat-box.png' %}" alt="Chatify" class="w-72 h-72 mx-auto mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700">Welcome to Chatify</h2>
+                <p class="text-gray-500 mt-2">Select a chat to start messaging</p>
+            </div>
+        </div>
+
+        <!-- Chat View (Initially Hidden) -->
+        <div id="chat-view" class="hidden flex flex-col h-full">
+            <!-- Header - Fixed -->
+            {% include 'chat_header.html' %}
+
+            <!-- Messages - Scrollable -->
+            <div id="chat_messages" class="flex-1 overflow-y-auto p-4 space-y-4 list-none bg-gray-50">
+                {% for message in chat_messages reversed %}
+                {% include 'chat_message.html' %}
+                {% endfor %}
+            </div>
+
+            <footer class="bg-white border-t border-gray-200 p-2 flex-none">
+                <!-- File Upload Form (Initially Hidden) -->
+                <form id="chat_file_form" enctype="multipart/form-data" class="hidden flex items-center w-full mb-2"
+                    hx-post="{% url 'chat-file-upload' chat_group.group_name %}"
+                    x-target="#chat_messages"
+                    hx-swap="beforeend"
+                    _="on htmx:beforeSend reset() me">
+                    {% csrf_token %}
+                    <label for="id_file" class="cursor-pointer flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        <!-- Hidden file input -->
+                        <input type="file" name="file" id="id_file" class="hidden" onchange="displayFileName()">
+                    </label>
+                    <!-- Span to display the selected file name -->
+                    <span id="file-name" class="ml-2 text-sm text-gray-500">No file selected</span>
+                    <button type="submit" id="upload-button" class="bg-indigo-600 text-white px-3 py-1 rounded-lg shadow-lg transition-all cursor-pointer ml-2 text-sm hidden">Upload File</button>
+                </form>
+            
+                <!-- Chat Message Form -->
+                <form id="chat_message_form" class="flex items-center w-full mb-20"
+                    hx-ext="ws"
+                    ws-connect="/ws/chatroom/{{chatroom_name}}"
+                    ws-send
+                    _="on htmx:wsAfterSend reset() me">
+                    {% csrf_token %}
+                    {{ form }}
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all cursor-pointer ml-2">Send</button>
+                    <!-- + Icon to Show File Upload Form -->
+                    <button type="button" id="toggle-file-form" class="text-gray-500 px-2 py-1 rounded-lg transition-all cursor-pointer ml-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </form>
+            </footer>
+        </div>
+    </main>
+</div>
+
+<script>
+    function scrollToBottom(time = 0) {
+        setTimeout(function () {
+            const messagesContainer = document.getElementById('chat_messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, time);
+    }
+
+    function showChat(chatId) {
+        const defaultView = document.getElementById('default-view');
+        const chatView = document.getElementById('chat-view');
+        
+        if (defaultView && chatView) {
+            defaultView.style.display = 'none';  // Hide default view
+            chatView.classList.remove('hidden'); // Show chat view
+            loadChatMessages(chatId);
+            scrollToBottom();
+        } else {
+            console.error('One or more view elements not found');
+        }
+    }
+
+    function hideChat() {
+        const defaultView = document.getElementById('default-view');
+        const chatView = document.getElementById('chat-view');
+        
+        if (defaultView && chatView) {
+            defaultView.style.display = 'flex';  // Show default view
+            chatView.classList.add('hidden');    // Hide chat view
+        } else {
+            console.error('One or more view elements not found');
+        }
+    }
+
+    function handleUrlChange() {
+        const path = window.location.pathname;
+        const match = path.match(/^\/chats\/chat\/room\/([^/]+)/);
+        
+        if (match) {
+            const chatId = match[1];
+            showChat(chatId);
+        } else {
+            hideChat();
+        }
+    }
+
+    window.addEventListener('popstate', handleUrlChange);
+    document.addEventListener('DOMContentLoaded', handleUrlChange);
+
+    function loadChatMessages(chatId) {
+        console.log(`Loading messages for chat ${chatId}`);
+    }
+
+    function displayFileName() {
+        var fileInput = document.getElementById('id_file');
+        var fileName = document.getElementById('file-name');
+        var uploadButton = document.getElementById('upload-button');
+
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+            uploadButton.classList.remove('hidden');
+        } else {
+            uploadButton.classList.add('hidden');
+        }
+    }
+
+    document.getElementById('toggle-file-form').addEventListener('click', function () {
+        var fileForm = document.getElementById('chat_file_form');
+        fileForm.classList.toggle('hidden');
+    });
+
+    document.getElementById('chat_file_form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        var formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('id_file').value = '';
+                    document.getElementById('file-name').textContent = 'No file selected';
+                    document.getElementById('upload-button').classList.add('hidden');
+                } else {
+                    console.error('Upload failed:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="py-3 sm:max-w-xl sm:mx-auto w-full px-4 sm:px-0 p-10 m-20">
+    <div class="bg-white shadow-lg rounded-3xl p-8">
+        <h1 class="text-2xl font-bold mb-4 text-center">Edit Chat</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="flex space-x-4 mb-6">
+                <!-- First Div -->
+                <div class="w-1/2 flex flex-col items-center">
+                    <div class="relative">
+                        <img id="group-image-preview" class="w-24 h-24 rounded-full object-cover mb-4 ml-20" 
+                             src="{{ chat_group.avatar }}" alt="Group Image">
+                    
+                        {{ form.group_image }}
+                    </div>
+                    <div class="w-full mt-6">
+                        {{ form.groupchat_name }}
+                    </div>
+                </div>
+
+                <!-- Second Div -->
+                <div class="w-1/2">
+                    <h2 class="text-lg font-semibold mb-4">Members</h2>
+                    <div class="border rounded-lg overflow-y-auto" style="max-height: 200px;">
+                        {% for member in members %}
+                        <div class="flex justify-between items-center py-2 px-3 {% if not forloop.last %}border-b{% endif %}">
+                            <div class="flex items-center gap-2">
+                                <img class="w-10 h-10 rounded-full object-cover" src="{{ member.profile.avatar }}" alt="{{ member.profile.name }}">
+                                <div>
+                                    <span class="font-semibold">{{ member.name}}</span> 
+                                    <span class="text-sm text-gray-500">@{{ member.profile.name }}</span>
+                                </div>
+                            </div>
+                            {% if member != chat_group.admin %}
+                            <div>
+                                <input type="checkbox" name="remove_members" value="{{ member.id }}" class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            </div>
+                            {%else%}
+                            <div class="text-sm text-red-600">admin</div>
+                            {% endif %}
+                        </div> 
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-4">
+                <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded">
+                    Update
+                </button>
+                <a href="{% url 'chatroom-delete' chat_group.group_name%}" class="px-4 py-2  text-red-400 font-bold rounded">
+                    Delete Chatroom
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('{{ form.group_image.id_for_label }}').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('group-image-preview').src = e.target.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        } else {
+            document.getElementById('group-image-preview').src = '{{ chat_group.avatar }}';
+        }
+    });
+</script>
+
+{% endblock %}

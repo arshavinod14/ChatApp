@@ -1,0 +1,86 @@
+<!-- Sidebar -->
+{% load static%}
+<aside class="w-16 md:w-1/4 flex flex-col h-full overflow-hidden border-r">
+    <!-- Search Bar (hidden on small screens) -->
+    <div class="hidden md:block p-4 sticky top-0 bg-white z-10 border-b border-gray-200">
+        <input type="text" placeholder="Search" id="chat-search" class="w-full p-2 border border-gray-300 rounded">
+    </div>
+
+    <!-- Create New Chat Button -->
+    <div class="bg-blue-950">
+        <a href="{% url 'new-groupchat' %}" class="block w-full bg-blue-950 text-white p-4 text-center transition duration-300">
+            <span class="hidden md:inline">Create New Chat</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto md:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+        </a>
+    </div>
+
+    <!-- Chat List -->
+    <ul id="chat-list" class="flex-1 overflow-y-auto">
+        <!-- "Nothing here" Message -->
+        <li id="no-results" class="text-center p-4 text-gray-500" style="display: none;">
+            Nothing here!!
+        </li>
+
+        <!-- Combined Group and Private Chats -->
+        {% for chatroom in chat_groups %}
+            <li class="flex items-center p-2 md:p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200">
+                <a class="flex items-center w-full" href="{% url 'chatroom' chatroom.group_name %}">
+                    {% if chatroom.is_private %}
+                        {% for member in chatroom.members.all %}
+                            {% if member != user %}
+                                <img src="{{ member.profile.avatar }}" alt="User" class="w-10 h-10 rounded-full mr-3 border border-gray-300">
+                                <div class="hidden md:flex flex-col w-full">
+                                    <div class="flex justify-between w-full">
+                                        <div class="flex flex-col">
+                                            <span>{{ member.name }}</span>
+                                            <span class="text-gray-400 text-sm">@{{ member.profile.name }}</span>
+                                        </div>
+                                        <span class="text-xs text-gray-400">
+                                            {{ chatroom.get_formatted_last_activity }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="{{ chatroom.avatar }}" alt="Group" class="w-10 h-10 rounded-full mr-3 border border-gray-300 object-cover">
+                        <div class="hidden md:flex flex-col w-full">
+                            <div class="flex justify-between w-full">
+                                <span>{{ chatroom.groupchat_name|default:chatroom.group_name|slice:":30" }}</span>
+                                <span class="text-xs text-gray-400">
+                                    {{ chatroom.get_formatted_last_activity }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</aside>
+
+<script>
+    document.getElementById('chat-search').addEventListener('input', function() {
+        const searchQuery = this.value.toLowerCase();
+        const chatItems = document.querySelectorAll('#chat-list li');
+        let hasResults = false;
+    
+        chatItems.forEach(function(chatItem) {
+            if (chatItem.id === 'no-results') return;
+    
+            const chatText = chatItem.textContent.toLowerCase();
+            
+            if (chatText.includes(searchQuery)) {
+                chatItem.style.display = '';
+                hasResults = true;
+            } else {
+                chatItem.style.display = 'none';
+            }
+        });
+    
+        document.getElementById('no-results').style.display = hasResults ? 'none' : '';
+    });
+</script>
+

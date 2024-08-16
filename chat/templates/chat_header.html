@@ -1,0 +1,60 @@
+{% load static%}
+{% block content %}
+<header class="p-3 flex-none bg-white border-b border-gray-200">
+    <div class="flex justify-between items-center">
+        <div class="flex flex-row items-center space-x-4 overflow-hidden">
+            {% if other_user %}
+                <a href="{% url 'profile' other_user.name %}" class="flex items-center space-x-2 flex-shrink-0">
+                    <div class="relative">
+                        {% if other_user in chat_group.users_online.all %}
+                            <div class="absolute rounded-full bg-green-500 p-1.5 border-2 border-gray-200 bottom-0 right-0"></div>
+                        {% else %}
+                            <div class="absolute rounded-full bg-gray-500 p-1.5 border-2 border-gray-200 bottom-0 right-0"></div>
+                        {% endif %}
+                        <img class="w-10 h-10 rounded-full border border-gray-200 object-cover" src="{{ other_user.profile.avatar }}" alt="{{ other_user.profile.name }}" />
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-semibold text-black">{{ other_user.profile.name }}</span> 
+                        <span class="text-sm font-light text-gray-400">@{{ other_user.name }}</span>
+                    </div>
+                </a>
+            {% elif chat_group.groupchat_name %}
+                <div class="flex items-center flex-shrink-0">
+                    <img src="{{ chat_group.avatar }}" alt="group icon" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+                    <div class="ml-2">
+                        <div class="flex justify-between">
+                            <h2 class="text-lg text-slate-600 font-semibold">{{ chat_group.groupchat_name }}</h2>
+                            {% if user == chat_group.admin %}
+                                <a href="{% url 'edit-chatroom' chat_group.group_name %}">
+                                    <div class="p-2 rounded-lg transition-colors">
+                                        <svg class="fill-gray-600" width="16" height="16">
+                                            <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"></path>
+                                        </svg>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <span id="online-count" class="text-sm text-gray-500"></span>
+                        <span class="text-sm text-gray-500">online</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="flex items-center flex-shrink-0">
+                    <img src="{{ chat_group.avatar }}" alt="group icon" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+                    <div class="ml-2">
+                        <h2 class="text-lg text-slate-600 font-semibold">{{ chat_group.group_name }}</h2>
+                        <span id="online-count" class="text-sm text-gray-500"></span>
+                        <span class="text-sm text-gray-500">online</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if chat_group.groupchat_name and chat_group.group_name != 'public-chat' and not other_user %}
+            <a href="{% url 'chatroom-leave' chat_group.group_name %}" class="text-gray-400 hover:text-black transition-colors ml-4 flex-shrink-0">
+                Leave Chat
+            </a>
+        {% endif %}
+    </div>
+</header>
+
+{% endblock %}

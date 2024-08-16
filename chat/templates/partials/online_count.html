@@ -1,0 +1,39 @@
+<span id="online-count" hx-swap-oob="outerHTML" class="fade-in-scale text-sm text-gray-500 ml-1 mr-0.5 ">
+    {{online_count}}
+    <style>
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(4); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .fade-in-scale {
+            animation: fadeInScale 0.6s ease;
+        }
+    </style> 
+</span>
+
+{% if online_count %}
+<div id="online-icon" class="absolute rounded-full bg-green-500 p-1.5 "></div>
+{%else%}
+<div id="online-icon" class="absolute rounded-full bg-gray-500 p-1.5"></div>
+{%endif%}
+
+
+
+<ul id="groupchat-members" class="flex space-x-2 overflow-x-auto">
+    {% for member in chat_group.members.all %}
+        <li class="flex-shrink-0">
+            <a href="{% url 'profile' member.name %}" class="flex flex-col items-center justify-center w-16 text-center">
+
+                <div class="relative">
+                    {%if member in chat_group.users_online.all%}
+                        <div class="absolute rounded-full bg-green-500 p-1.5 border-2 border-gray-200 bottom-0 right-0"></div>
+                    {%else%}
+                        <div class="absolute rounded-full bg-gray-500 p-1.5 border-2 border-gray-200 bottom-0 right-0"></div>
+                    {%endif%}
+                    <img src="{{ member.profile.avatar }}" alt="{{ member.profile.name }}" class="w-10 h-10 rounded-full object-cover mb-1"/>
+                </div>
+                <span class="text-xs text-gray-400 truncate w-full">{{ member.profile.name|slice:":10" }}</span>
+            </a>
+        </li>
+    {% endfor %}
+</ul>

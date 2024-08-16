@@ -38,7 +38,9 @@ if ENVIRONMENT == 'development':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','chatapp-ol5j.onrender.com']
+
+CSRF_TRUSTED_ORIGINS = ['https://chatapp-ol5j.onrender.com']
 
 LOGIN_URL = '/login/'  # Adjust this to match your actual login URL pattern
 

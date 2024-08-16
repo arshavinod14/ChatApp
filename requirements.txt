@@ -14,4 +14,4 @@ whitenoise==6.7.0
 shortuuid==1.0.13
 pytz==2024.1
 dj-database-url==2.2.0
-
+django-browser-reload==1.13.0

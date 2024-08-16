@@ -10,7 +10,6 @@ from django.contrib import messages
 from channels.layers import get_channel_layer
 
 
-
 @login_required
 def chatHomepage(request, chatroom_name='public-chat'):
     profile = request.user.profile
@@ -23,7 +22,8 @@ def chatHomepage(request, chatroom_name='public-chat'):
     if chat_group.is_private:
         if request.user not in chat_group.members.all():
             chat_group.members.add(request.user)  # Allow rejoining for private groups
-        for member in chat_group.members.all():
+        members = chat_group.members.all()
+        for member in members:
             if member != request.user:
                 other_user = member
                 break
@@ -32,14 +32,16 @@ def chatHomepage(request, chatroom_name='public-chat'):
         if request.user not in chat_group.members.all():
             chat_group.members.add(request.user)
 
-
     for group in request.user.chat_groups.all():
         if not group.groupchat_name:
             group.groupchat_name = group.group_name
             group.save()
 
-    
     chat_groups = request.user.chat_groups.all().order_by('-last_activity')
+
+    # Debugging Output
+    print("Other User:", other_user)
+    print("Chat Group Members:", chat_group.members.all())
 
     if request.htmx:
         form = ChatmessageCreateForm(request.POST)
@@ -49,7 +51,6 @@ def chatHomepage(request, chatroom_name='public-chat'):
             message.group = chat_group
             message.save()
             
-           
             chat_group.update_last_activity()
 
             context = {
@@ -68,7 +69,6 @@ def chatHomepage(request, chatroom_name='public-chat'):
         'chat_groups': chat_groups, 
     }
     return render(request, 'chatHomepage.html', context)
-
 
 
 
@@ -94,7 +94,7 @@ def get_or_create_chatroom(request, name):
         chatroom = ChatGroup.objects.create(is_private=True)
         chatroom.members.add(other_user, request.user)
     else:
-        chatroom.members.add(request.user)  
+        chatroom.members.add(request.user)  # Allow rejoining by adding the user back to the group
 
     return redirect('chatroom', chatroom_name=chatroom.group_name)
 
@@ -149,9 +149,9 @@ def chatroom_edit_view(request, chatroom_name):
 
             return redirect('chatroom', chatroom_name)
         else:
-            print(form.errors)  
+            print(form.errors)  # Print form errors if the form is not valid
 
-   
+    # Fetch all members of the chat group
     members = chat_group.members.all().select_related('profile')
 
     context = {

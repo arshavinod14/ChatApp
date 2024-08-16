@@ -32,13 +32,13 @@ def chatHomepage(request, chatroom_name='public-chat'):
         if request.user not in chat_group.members.all():
             chat_group.members.add(request.user)
 
-    # Ensure all chat groups have a unique groupchat_name
+
     for group in request.user.chat_groups.all():
         if not group.groupchat_name:
             group.groupchat_name = group.group_name
             group.save()
 
-    # Sort chat groups by last_activity (newest first)
+    
     chat_groups = request.user.chat_groups.all().order_by('-last_activity')
 
     if request.htmx:
@@ -49,7 +49,7 @@ def chatHomepage(request, chatroom_name='public-chat'):
             message.group = chat_group
             message.save()
             
-            # Update last_activity field for the chat group only when a message is sent
+           
             chat_group.update_last_activity()
 
             context = {
@@ -65,7 +65,7 @@ def chatHomepage(request, chatroom_name='public-chat'):
         'chatroom_name': chatroom_name,
         'chat_group': chat_group,
         'profile': profile,
-        'chat_groups': chat_groups,  # Pass sorted chat groups to the template
+        'chat_groups': chat_groups, 
     }
     return render(request, 'chatHomepage.html', context)
 
@@ -94,7 +94,7 @@ def get_or_create_chatroom(request, name):
         chatroom = ChatGroup.objects.create(is_private=True)
         chatroom.members.add(other_user, request.user)
     else:
-        chatroom.members.add(request.user)  # Allow rejoining by adding the user back to the group
+        chatroom.members.add(request.user)  
 
     return redirect('chatroom', chatroom_name=chatroom.group_name)
 
@@ -149,9 +149,9 @@ def chatroom_edit_view(request, chatroom_name):
 
             return redirect('chatroom', chatroom_name)
         else:
-            print(form.errors)  # Print form errors if the form is not valid
+            print(form.errors)  
 
-    # Fetch all members of the chat group
+   
     members = chat_group.members.all().select_related('profile')
 
     context = {
